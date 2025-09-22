@@ -1,13 +1,11 @@
-using EventReg.Application.Interfaces;
-using EventReg.Application.Services;
-using EventReg.Application.Mapping;
 using EventReg.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using EventReg.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using EventReg.Api.Filters;
+using EventReg.Application.Extentions;
+using EventReg.Persistence.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,17 +15,8 @@ builder.Configuration.SetBasePath(Directory.GetCurrentDirectory())
     .AddUserSecrets<Program>(optional: true)
     .AddEnvironmentVariables();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddApplication();
+builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {
@@ -42,7 +31,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => { options.Filters.Add<ValidationActionFilter>(); });
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

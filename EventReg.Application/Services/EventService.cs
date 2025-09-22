@@ -43,7 +43,7 @@ public class EventService : IEventService
         return _mapper.Map<EventDto>(ev);
     }
 
-    public async Task<EventDto?> UpdateAsync(int id, EventUpdateDto dto)
+    public async Task<EventDto?> UpdateAsync(int id, EventCreateDto dto)
     {
         var existEv = await _dbContext.Events.FindAsync(id);
         if (existEv == null) return null;

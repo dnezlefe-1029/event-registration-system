@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using EventReg.Domain.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using EventReg.Application.DTOs;
 using EventReg.Application.Interfaces;
+using FluentValidation;
 
 namespace EventReg.Api.Controllers;
 
@@ -35,15 +34,8 @@ public class RegistrationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] RegistrationCreateDto registration)
     {
-        try
-        {
-            var reg = await _registrationService.CreateAsync(registration);
-            return CreatedAtAction(nameof(GetById), new { Id = reg.Id }, reg);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var reg = await _registrationService.CreateAsync(registration);
+        return CreatedAtAction(nameof(GetById), new { Id = reg.Id }, reg);
     }
 
     [HttpPut("{id}")]

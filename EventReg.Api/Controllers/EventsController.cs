@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using EventReg.Domain.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using EventReg.Application.Interfaces;
-using EventReg.Application.Services;
 using EventReg.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 
@@ -38,16 +35,18 @@ public class EventsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] EventCreateDto ev)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
         var createdEvent = await _eventService.CreateAsync(ev);
+
         return CreatedAtAction(nameof(GetById), new { id = createdEvent.Id }, createdEvent);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] EventUpdateDto ev)
+    public async Task<IActionResult> Update(int id, [FromBody] EventCreateDto ev)
     {
         var updated = await _eventService.UpdateAsync(id, ev);
+
         if (updated == null) return NotFound();
+
         return Ok(updated);
     }
 

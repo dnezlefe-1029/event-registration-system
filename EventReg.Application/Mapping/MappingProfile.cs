@@ -14,6 +14,5 @@ public class MappingProfile : Profile
 
         CreateMap<Event, EventDto>().ReverseMap();
         CreateMap<EventCreateDto, Event>();
-        CreateMap<EventUpdateDto, Event>();
     }
 }
