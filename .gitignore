@@ -18,7 +18,7 @@ x86/
 *.swp
 
 # Logs
-*.log
+*.Log/
 
 # Dependency folders
 node_modules/
