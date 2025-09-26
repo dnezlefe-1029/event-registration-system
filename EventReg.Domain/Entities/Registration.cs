@@ -9,4 +9,6 @@ public class Registration
     public string AttendeeEmail { get; set; } = null!;
     public string QRCode { get; set; } = null!;
     public DateTime RegisteredAt { get; set; }
+    public Event Event { get; set; } = default!;
+    public User? User { get; set; }
 }

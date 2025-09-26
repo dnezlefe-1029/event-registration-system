@@ -4,6 +4,7 @@ using EventReg.Application.DTOs;
 using EventReg.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using EventReg.Application.Extentions;
 
 namespace EventReg.Application.Services;
 
@@ -33,9 +34,21 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    public async Task<PagedResult<UserDto>> GetAllUsersAsync(QueryParameters queryParameters)
     {
-        return await _dbContext.Users
+        var query = _dbContext.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(queryParameters.Search))
+        {
+            query = query.Where(u => 
+                u.Name.Contains(queryParameters.Search) || 
+                u.Username.Contains(queryParameters.Search) ||
+                u.Email.Contains(queryParameters.Search));
+        }
+
+
+        return await query
+            .OrderBy(u => u.Id)
             .Select(user => new UserDto
             {
                 Id = user.Id,
@@ -44,7 +57,7 @@ public class UserService : IUserService
                 Role = user.Role,
                 Username = user.Username
             })
-            .ToListAsync();
+            .ToPagedResultAsync(queryParameters.PageNumber, queryParameters.PageSize);
     }
 
     public async Task<UserDto> CreateUserAsync(UserCreateDto createUserDto)

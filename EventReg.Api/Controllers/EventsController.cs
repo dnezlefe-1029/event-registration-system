@@ -18,9 +18,9 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] EventQueryParameters query)
     {
-        var events = await _eventService.GellAllAsync();
+        var events = await _eventService.GetAllAsync(query);
         return Ok(events);
     }
 

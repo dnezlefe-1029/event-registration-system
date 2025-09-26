@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using EventReg.Application.Common;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -30,15 +31,18 @@ public class ValidationActionFilter : IAsyncActionFilter
 
             if (!result.IsValid)
             {
-                context.Result = new BadRequestObjectResult(result.Errors.Select(e => new
+                var errors = result.Errors.Select(e => new ApiError
                 {
-                    e.PropertyName,
-                    e.ErrorMessage
-                }));
+                    Field = e.PropertyName,
+                    Error = e.ErrorMessage
+                });
+
+                var response = ApiResponse<object>.Failed("Validation failed", 400, errors);
+                context.Result = new JsonResult(response) { StatusCode = 400 };
                 return;
             }
-
-            await next();
         }
+
+        await next();
     }
 }

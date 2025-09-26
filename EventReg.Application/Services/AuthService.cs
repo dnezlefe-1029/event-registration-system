@@ -27,7 +27,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user == null) return null;
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
@@ -56,7 +56,8 @@ public class AuthService : IAuthService
             Token = new JwtSecurityTokenHandler().WriteToken(token),
             Username = user.Username,
             Role = user.Role,
-            Id = user.Id
+            Id = user.Id,
+            Email = dto.Email,
         };
     }
 }

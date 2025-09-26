@@ -4,6 +4,7 @@ using EventReg.Persistence;
 using Microsoft.EntityFrameworkCore;
 using EventReg.Application.DTOs;
 using AutoMapper;
+using EventReg.Application.Extentions;
 
 namespace EventReg.Application.Services;
 
@@ -17,13 +18,39 @@ public class RegistrationService : IRegistrationService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<RegistrationDto>> GetAllAsync()
+    public async Task<PagedResult<RegistrationDto>> GetAllAsync(RegistrationQueryParameters parameters)
     {
+        var query = _dbContext.Registrations.AsQueryable();
 
-       var lists=  await _dbContext.Registrations
-            .ToListAsync();
+        if (parameters.EventId.HasValue)
+        {
+            query = query.Where(r => r.EventId == parameters.EventId);
+        }
 
-        return _mapper.Map<IEnumerable<RegistrationDto>>(lists);
+        if (!string.IsNullOrEmpty(parameters.Search))
+        {
+            query = query.Where(r =>
+                r.AttendeeName.Contains(parameters.Search) ||
+                r.AttendeeEmail.Contains(parameters.Search));
+        }
+
+        return await query
+            .OrderByDescending(r => r.RegisteredAt)
+            .Select(r => new RegistrationDto
+            {
+                Id = r.Id,
+                EventId = r.EventId,
+                UserId = r.User == null ? null : r.User.Id,
+                AttendeeName = r.AttendeeName,
+                AttendeeEmail = r.AttendeeEmail,
+                RegistredAt = r.RegisteredAt,
+                User = r.User == null ? null : new UserDto
+                {
+                    Id = r.User.Id,
+                    Name = r.User.Name,
+                    Email = r.User.Email
+                }
+            }).ToPagedResultAsync(parameters.PageNumber, parameters.PageSize);
     }
 
     public async Task<RegistrationDto?> GetByIdAsync(int eventId)

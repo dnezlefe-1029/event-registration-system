@@ -18,7 +18,7 @@ public class UserCreateDtoValidator : AbstractValidator<UserCreateDto>
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .MinimumLength(60) 
+            .MinimumLength(6) 
             .WithMessage("Password must be at least 6 characters long");
 
         RuleFor(x => x.Email)

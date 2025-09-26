@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EventReg.Application.DTOs;
 using EventReg.Application.Interfaces;
-using FluentValidation;
 
 namespace EventReg.Api.Controllers;
 
@@ -17,9 +16,9 @@ public class RegistrationsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] RegistrationQueryParameters query)
     {
-        var list = await _registrationService.GetAllAsync();
+        var list = await _registrationService.GetAllAsync(query);
         return Ok(list);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using EventReg.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace EventReg.Persistence;
 
@@ -15,10 +16,14 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        var hasher = new PasswordHasher<User>();
+        var admin = new User();
+        string passwordHash = hasher.HashPassword(admin, "123456789");
+
         // Seed Users
         modelBuilder.Entity<User>().HasData(
-            new User { Id = 1, Name = "Admin Admin", Username = "admin", Email = "dnezle@gmail.com", PasswordHash = "hashedpassword", Role = "Admin" },
-            new User { Id = 2, Name = "Test User", Username = "user", Email = "cecil94.doncillo@gmail.com", PasswordHash = "hashedpassword", Role = "Attendee" }
+            new User { Id = 1, Name = "Admin Admin", Username = "admin", Email = "dnezle@gmail.com", PasswordHash = passwordHash, Role = "Admin" },
+            new User { Id = 2, Name = "Test User", Username = "user", Email = "cecil94.doncillo@gmail.com", PasswordHash = passwordHash, Role = "Attendee" }
         );
 
         // Seed Events
